@@ -1,8 +1,11 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import io
+import arabic_reshaper
+from bidi.algorithm import get_display
+import os
 
-st.set_page_config(page_title="Image Text Editor", layout="wide")
+st.set_page_config(page_title="Image Text Editor PRO", layout="wide")
 
 # -----------------------------
 # SESSION STATE
@@ -11,9 +14,20 @@ if "final_img" not in st.session_state:
     st.session_state.final_img = None
 
 # -----------------------------
+# LOAD FONT
+# -----------------------------
+def load_font(size):
+    font_path = "fonts/NotoNastaliqUrdu-Regular.ttf"
+
+    if os.path.exists(font_path):
+        return ImageFont.truetype(font_path, size)
+    else:
+        return ImageFont.load_default()  # fallback (size won't scale properly)
+
+# -----------------------------
 # TITLE
 # -----------------------------
-st.title("🖼️ Image Text Editor (Urdu + English)")
+st.title("🖼️ Image Text Editor PRO (Urdu + English)")
 
 # -----------------------------
 # IMAGE UPLOAD
@@ -30,7 +44,7 @@ if uploaded_file:
     text = st.text_area("Enter Text (Urdu / English)")
 
     # -----------------------------
-    # TEXT SETTINGS
+    # CONTROLS
     # -----------------------------
     col1, col2, col3 = st.columns(3)
 
@@ -52,12 +66,16 @@ if uploaded_file:
         img_copy = image.copy()
         draw = ImageDraw.Draw(img_copy)
 
-        try:
-            font = ImageFont.truetype("arial.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
+        font = load_font(font_size)
 
-        draw.text((x_pos, y_pos), text, fill=text_color, font=font)
+        # Urdu support
+        try:
+            reshaped_text = arabic_reshaper.reshape(text)
+            bidi_text = get_display(reshaped_text)
+        except:
+            bidi_text = text
+
+        draw.text((x_pos, y_pos), bidi_text, fill=text_color, font=font)
 
         st.session_state.final_img = img_copy
 
