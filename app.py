@@ -18,8 +18,7 @@ if "final_img" not in st.session_state:
 # -----------------------------
 def load_font(size):
     font_paths = [
-        "fonts/NotoNastaliqUrdu-Regular.ttf",              # BEST (static)
-        "fonts/NotoNastaliqUrdu-VariableFont_wght.ttf"     # fallback
+        "fonts/Jameel Noori Nastaleeq.ttf",
     ]
 
     for path in font_paths:
